@@ -1,66 +1,131 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>認証</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アカウント認証</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #f0f0f0;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f2f2f2;
-      color: #333;
+    }
+    .container {
+      background-color: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
       text-align: center;
     }
-
     h1 {
       margin-bottom: 20px;
-      color: #007bff;
+      color: #4caf50;
     }
-
-    p {
-      margin-bottom: 30px;
-      line-height: 1.5;
-      font-size: 18px;
-      max-width: 400px; /* 最大幅を指定して読みやすく */
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #333;
+      color: #fff;
     }
-
-    .button-container {
-      margin-top: 20px;
-    }
-
     button {
-      padding: 15px 30px;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #4caf50;
       border: none;
-      border-radius: 5px;
-      background-color: #007bff;
+      border-radius: 4px;
       color: white;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s;
     }
-
     button:hover {
-      background-color: #0056b3;
+      background-color: #45a049;
+    }
+    .locked {
+      color: #ff5722;
     }
   </style>
 </head>
-
 <body>
-  <h1>アカウント認証</h1>
-  <p>輝一さん（組織管理者）からあなたが管理者として招待されました。アカウントをアクティブにしてください。</p>
-  
-  <div class="button-container">
-    <button onclick="window.location.href='https://user0888361.github.io/id-1985338258525875.invenite-Mobiconnect/'">アクティブにする</button>
-<h4>以下のリセットキーをメモしてください</h4>
-<h1>G-D1465</h1>
+  <div class="container">
+    <h1>アカウント認証</h1>
+    <p id="instruction">リセット番号を入力してください。</p>
+    <input type="text" id="resetCode" placeholder="リセット番号">
+    <button id="submitButton">送信</button>
+    <p id="message"></p>
   </div>
-</body>
 
+  <script>
+    const correctResetCode = "123456"; // 正しいリセット番号
+    const unlockPassword = "unlock123"; // ロック解除パスワード
+    let attempts = 0;
+    let isLocked = false;
+
+    const instruction = document.getElementById("instruction");
+    const resetCodeInput = document.getElementById("resetCode");
+    const submitButton = document.getElementById("submitButton");
+    const message = document.getElementById("message");
+
+    submitButton.addEventListener("click", () => {
+      if (isLocked) {
+        handleUnlock();
+      } else {
+        handleResetCode();
+      }
+    });
+
+    function handleResetCode() {
+      const inputCode = resetCodeInput.value.trim();
+      if (inputCode === correctResetCode) {
+        window.location.href = "https://user0888361.github.io/id-1985338258525875.invenite-Mobiconnect/";
+      } else {
+        attempts++;
+        if (attempts >= 2) {
+          lockAccount();
+        } else {
+          message.textContent = "リセット番号が間違っています。再試行してください。";
+          message.style.color = "red";
+        }
+}
+      resetCodeInput.value = "";
+    }
+
+    function lockAccount() {
+      isLocked = true;
+      instruction.textContent = "アカウントがロックされました。解除パスワードを入力してください。";
+      resetCodeInput.type = "password";
+      resetCodeInput.placeholder = "解除パスワード";
+      submitButton.textContent = "解除";
+      message.textContent = "";
+    }
+
+    function handleUnlock() {
+      const inputPassword = resetCodeInput.value.trim();
+      if (inputPassword === unlockPassword) {
+        isLocked = false;
+        attempts = 0;
+        instruction.textContent = "リセット番号を入力してください。";
+        resetCodeInput.type = "text";
+        resetCodeInput.placeholder = "リセット番号";
+        submitButton.textContent = "送信";
+        message.textContent = "アカウントが解除されました。";
+        message.style.color = "green";
+      } else {
+        message.textContent = "解除パスワードが間違っています。";
+        message.style.color = "red";
+      }
+      resetCodeInput.value = "";
+    }
+  </script>
+</body>
 </html>
